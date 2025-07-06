@@ -2,6 +2,7 @@ import { useState } from "react"
 import Title from "./components/Title"
 import Form from "./components/Form"
 import Results from "./components/Results"
+import Loading from "./components/Loading"
 
 type ResultsState = {
   country: string
@@ -12,6 +13,7 @@ type ResultsState = {
 }
 
 const App = () => {
+  const [loading, setLoading] = useState<boolean>(false)
   const [city, setCity] = useState<string>("")
 
   const [results, setResults] = useState<ResultsState>({
@@ -24,6 +26,7 @@ const App = () => {
 
   const getWeather = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setLoading(true)
     fetch(`http://api.weatherapi.com/v1/current.json?key=c3bb75ae66804a4eb4654411250607&q=${city}&aqi=no`)
         .then(res => res.json())
         .then(data => {
@@ -34,6 +37,7 @@ const App = () => {
             conditionText: data.current.condition.text,
             icon: data.current.condition.icon
           })
+          setLoading(false)
         })
   }
 
@@ -43,7 +47,7 @@ const App = () => {
       <div className="container">
         <Title />
         <Form setCity={setCity} getWeather={getWeather}/>
-        <Results results={results}/>
+        {loading ? <Loading /> : <Results results={results}/>}
       </div>
     </div>
   )
